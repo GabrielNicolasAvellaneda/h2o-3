@@ -31,7 +31,7 @@ try {
 
       boolean healthCheckPassed = false
       int attempt = 0
-      stage('Checkout and Build') {
+      stage('Checkout') {
         while (!healthCheckPassed) {
           attempt += 1
           if (attempt > HEALTH_CHECK_RETRIES) {
@@ -81,12 +81,15 @@ try {
               defineTestStages = load('h2o-3/scripts/jenkins/groovy/defineTestStages.groovy')
             }
             healthCheckPassed = pipelineContext.getHealthChecker().checkHealth(this, env.NODE_NAME, pipelineContext.getBuildConfig().getDefaultImage(), pipelineContext.getBuildConfig().DOCKER_REGISTRY, pipelineContext.getBuildConfig())
-            if (healthCheckPassed) {
-              // Load build script and execute it
-              def buildH2O3 = load('h2o-3/scripts/jenkins/groovy/buildH2O3.groovy')
-              buildH2O3(pipelineContext)
-            }
           }
+        }
+      }
+      stage('Build') {
+        nodeLabel = pipelineContext.getHealthChecker().getHealthyNodesLabel(DEFAULT_NODE_LABEL)
+        node(nodeLabel) {
+          // Load build script and execute it
+          def buildH2O3 = load('h2o-3/scripts/jenkins/groovy/buildH2O3.groovy')
+          buildH2O3(pipelineContext)
         }
       }
 
