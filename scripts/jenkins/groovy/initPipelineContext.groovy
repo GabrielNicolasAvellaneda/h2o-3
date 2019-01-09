@@ -20,13 +20,9 @@ def call(final scmEnv, final String mode, final boolean ignoreChanges, final Lis
 }
 
 void clearStageDirs() {
-  def findCmd = "find . -maxdepth 1 -not -name 'h2o-3' -not -name h2o-3@tmp -not -name '.'"
-  def deleteCmd = " -exec rm -rf '{}' ';'"
-  def findDeleteCmd = findCmd + deleteCmd
-
-  echo "About to delete these files/folders:"
-  sh findCmd
-  sh findDeleteCmd
+  def findCmd = "find `pwd` -maxdepth 1 -not -name 'h2o-3' -not -name h2o-3@tmp -not -path `pwd`"
+  def deleteCmd = " -exec rm -rfv '{}' ';'"
+  sh findCmd + deleteCmd
 }
 
 return this
